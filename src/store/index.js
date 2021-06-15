@@ -3,7 +3,7 @@ import { createStore } from 'vuex';
 export default createStore({
   state: {
     pokemons: {
-      data: [],
+      data: {},
       next: '',
     },
     abilities: {
@@ -17,7 +17,12 @@ export default createStore({
   },
   mutations: {
     STORE_POKEMONS(state, data) {
-      data.results.map((element) => (!state.pokemons.data.includes(element) ? state.pokemons.data.push(element) : ''));
+      data.results.map((element) => {
+        if (!state.pokemons.data[element.name]) {
+          state.pokemons.data[element.name] = element;
+        }
+        return true;
+      });
       state.pokemons.next = data.next;
     },
     STORE_ABILITIES(state, data) {

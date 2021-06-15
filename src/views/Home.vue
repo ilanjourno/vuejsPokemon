@@ -1,26 +1,51 @@
 <template>
   <div class="home">
-
+    <table>
+        <thead>
+          <tr>
+            <th
+              v-for="(element, index) in header"
+              :key="index"
+            >
+              {{element}}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(pokemon, index) in pokemons"
+            :key="index"
+          >
+            <td>{{pokemon.name}}</td>
+            <td>
+              <router-link :to="'/pokemon/'+pokemon.name"
+              class="btn btn-primary">Voir la fiche</router-link>
+            </td>
+          </tr>
+        </tbody>
+    </table>
   </div>
 </template>
 
 <script>
-import { onMounted } from 'vue';
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue';
+import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 
 export default {
   name: 'Home',
-  // components: {
-  //   HelloWorld,
-  // },
   setup() {
+    const store = useStore();
+    const pokemons = ref([]);
+    const header = ['Nom :', 'Actions :'];
     onMounted(async () => {
-      const store = useStore();
       await store.dispatch('getPokemons');
-      console.log(store.state.pokemons);
+      pokemons.value = store.state.pokemons.data;
     });
+
+    return {
+      pokemons,
+      header,
+    };
   },
 };
 </script>
