@@ -28,19 +28,14 @@
 </template>
 
 <script>
-import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 
 export default {
   name: 'Home',
   setup() {
     const store = useStore();
-    const pokemons = ref([]);
+    const pokemons = store.state.pokemons.data;
     const header = ['Nom :', 'Actions :'];
-    onMounted(async () => {
-      await store.dispatch('getPokemons');
-      pokemons.value = store.state.pokemons.data;
-    });
 
     return {
       pokemons,

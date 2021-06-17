@@ -33,6 +33,9 @@ export default createStore({
       data.results.map((element) => (!state.types.data.includes(element) ? state.types.data.push(element) : ''));
       state.types.next = data.next;
     },
+    UPSERT_POKEMON(state, data) {
+      state.pokemons.data[data.name] = data;
+    },
   },
   actions: {
     getPokemons({ commit }) {
@@ -49,6 +52,11 @@ export default createStore({
       return fetch(`${process.env.VUE_APP_POKEMON_API}/type`)
         .then((res) => res.json())
         .then((res) => commit('STORE_TYPES', res));
+    },
+    getPokemon({ commit }, name) {
+      return fetch(`${process.env.VUE_APP_POKEMON_API}/pokemon/${name}`)
+        .then((res) => res.json())
+        .then((res) => commit('UPSERT_POKEMON', res));
     },
   },
 });

@@ -2,9 +2,23 @@
   <div id="nav">
     <router-link to="/">Les pokémons</router-link>
   </div>
-  <router-view/>
+  <router-view v-if="Object.keys(pokemons).length > 0" />
 </template>
+<script>
+import { useStore } from 'vuex';
 
+export default {
+  name: 'App',
+  setup() {
+    const store = useStore();
+    store.dispatch('getPokemons');
+    const pokemons = store.state.pokemons.data;
+    return {
+      pokemons,
+    };
+  },
+};
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
