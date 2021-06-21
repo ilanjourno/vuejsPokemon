@@ -1,19 +1,21 @@
 <template>
   <h1>{{pokemonName}}</h1>
-  <div v-if="pokemon">
-    <h1>{{pokemon}}</h1>
-  </div>
+  <Table :elements="tables"/>
 </template>
 
 <script>
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
+import Table from '../components/Table.vue';
 
 export default {
   name: 'Pokemon',
   props: {
     name: String,
+  },
+  components: {
+    Table,
   },
   setup(props) {
     const route = useRoute();
@@ -23,17 +25,83 @@ export default {
     if (!pokemons[pokemonName] || !pokemons[pokemonName].id) {
       store.dispatch('getPokemon', pokemonName);
     }
-    const pokemon = computed(() => {
-      console.log(pokemons[pokemonName]);
-      return pokemons[pokemonName];
-    });
+    const pokemon = computed(() => pokemons[pokemonName]);
     const tables = computed(() => {
-      const abilities = {
-        title: "Abilités",
-        data: pokemon.abilities.map(() => 'ilan')
-      }
-      console.log(abilities);
-      return "ilan";
+      const result = [
+        {
+          title: 'Expérience :',
+          value: pokemon.value.base_experience,
+        },
+        {
+          title: 'Taille :',
+          value: pokemon.value.height,
+        },
+        {
+          title: 'Poid :',
+          value: pokemon.value.weight,
+        },
+        {
+          title: 'Espece :',
+          value: pokemon.value.species && pokemon.value.species.name,
+        },
+        {
+          title: 'Les abilités :',
+          header: [
+            {
+              label: 'Nom :',
+              value: 'ability.name',
+              url: '/ability/',
+            },
+          ],
+          columns: pokemon.value.abilities,
+        },
+        {
+          title: 'Types: ',
+          header: [
+            {
+              label: 'Slot :',
+              value: 'slot',
+            },
+            {
+              label: 'Nom :',
+              value: 'type.name',
+              url: '/type/',
+            },
+          ],
+          columns: pokemon.value.types,
+        },
+        {
+          title: 'Les mouvements :',
+          header: [
+            {
+              label: 'Nom :',
+              value: 'move.name',
+            },
+            {
+              label: 'Version détaillé :',
+              value: 'version_group_details',
+              array: {
+                header: [
+                  {
+                    label: 'Appris à :',
+                    value: 'level_learned_at',
+                  },
+                  {
+                    label: 'Mouvement d\'apprentissage :',
+                    value: 'move_learn_method.name',
+                  },
+                  {
+                    label: 'Version groupe :',
+                    value: 'version_group.name',
+                  },
+                ],
+              },
+            },
+          ],
+          columns: pokemon.value.moves,
+        },
+      ];
+      return result;
     });
     return {
       pokemonName,

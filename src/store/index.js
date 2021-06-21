@@ -6,14 +6,8 @@ export default createStore({
       data: {},
       next: '',
     },
-    abilities: {
-      data: [],
-      next: '',
-    },
-    types: {
-      data: [],
-      next: '',
-    },
+    abilities: {},
+    types: {},
   },
   mutations: {
     STORE_POKEMONS(state, data) {
@@ -26,15 +20,53 @@ export default createStore({
       state.pokemons.next = data.next;
     },
     STORE_ABILITIES(state, data) {
-      data.results.map((element) => (!state.abilities.data.includes(element) ? state.abilities.data.push(element) : ''));
-      state.abilities.next = data.next;
+      data.results.map((element) => {
+        if (!state.abilities[element.name]) {
+          state.abilities[element.name] = element;
+        }
+        return state.abilities[element.name];
+      });
     },
     STORE_TYPES(state, data) {
-      data.results.map((element) => (!state.types.data.includes(element) ? state.types.data.push(element) : ''));
-      state.types.next = data.next;
+      data.results.map((element) => {
+        if (!state.types[element.name]) {
+          state.types[element.name] = element;
+        }
+        return state.types[element.name];
+      });
+    },
+    STORE_TYPE(state, data) {
+      if (!state.types[data.name] || Object.values(state.types[data.name]).length === 2) {
+        state.types[data.name] = data;
+      }
+      return true;
+    },
+    STORE_ABILITY(state, data) {
+      if (!state.abilities[data.name] || Object.values(state.abilities[data.name]).length === 2) {
+        state.abilities[data.name] = data;
+      }
+      return true;
     },
     UPSERT_POKEMON(state, data) {
       state.pokemons.data[data.name] = data;
+    },
+    SEARCH_POKEMONS(state, data) {
+      if (data.value !== '') {
+        Object.entries(state.pokemons.data).map(([key]) => {
+          if (!key.includes(data.value)) {
+            state.pokemons.data[key].is_hidden = true;
+          } else {
+            state.pokemons.data[key].is_hidden = false;
+          }
+          return state.pokemons.data;
+        });
+      } else {
+        Object.entries(state.pokemons.data).map(([key]) => {
+          state.pokemons.data[key].is_hidden = false;
+          return state.pokemons.data;
+        });
+      }
+      return true;
     },
   },
   actions: {
@@ -57,6 +89,19 @@ export default createStore({
       return fetch(`${process.env.VUE_APP_POKEMON_API}/pokemon/${name}`)
         .then((res) => res.json())
         .then((res) => commit('UPSERT_POKEMON', res));
+    },
+    getType({ commit }, name) {
+      return fetch(`${process.env.VUE_APP_POKEMON_API}/type/${name}`)
+        .then((res) => res.json())
+        .then((res) => commit('STORE_TYPE', res));
+    },
+    getAbility({ commit }, name) {
+      return fetch(`${process.env.VUE_APP_POKEMON_API}/ability/${name}`)
+        .then((res) => res.json())
+        .then((res) => commit('STORE_ABILITY', res));
+    },
+    searchPokemon({ commit }, filter) {
+      return commit('SEARCH_POKEMONS', filter);
     },
   },
 });

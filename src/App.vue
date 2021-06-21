@@ -1,6 +1,7 @@
 <template>
   <div id="nav">
-    <router-link to="/">Les pokémons</router-link>
+    <router-link to="/">Les pokémons</router-link> |
+    <router-link to="/typesAndAbilities">Les types / abilitiés</router-link>
   </div>
   <router-view v-if="Object.keys(pokemons).length > 0" />
 </template>
@@ -12,6 +13,8 @@ export default {
   setup() {
     const store = useStore();
     store.dispatch('getPokemons');
+    store.dispatch('getTypes');
+    store.dispatch('getAbilities');
     const pokemons = store.state.pokemons.data;
     return {
       pokemons,
